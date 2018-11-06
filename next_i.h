@@ -1,2 +1,3 @@
+#include <sys/types.h>
 
-int next_num(int i);
+off_t next_num (off_t i);
