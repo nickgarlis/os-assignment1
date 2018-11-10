@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include "next_i.h"
 
-int open_file (const char *path, const int permissions);
+int open_file (const char *path, const int flag, const mode_t mode);
 ssize_t read_file (const int data_file, char *buffer, const size_t buff_size);
 ssize_t write_file (const int file_des, const char *buffer, const size_t buff_size); 
 void close_file (const int file_des);
@@ -22,17 +22,17 @@ int letters_file;
 int numbers_file;
 
 int main (int argc, char *argv[]) {
-    if (argc>3) {
+    if (argc!=3) {
         fprintf(stderr, "Wrong input\n");
         exit(1);
     }
 
-    const unsigned int offset = atoi(argv[1]); // TODO: Is there a better function to convert strings into integers ?
-    const size_t buff_size = int_to_size_t(atoi(argv[2])); // TODO: Is there a better function to convert strings into integers ?
-
-    data_file = open_file("data2.txt", O_RDONLY);
-    letters_file = open_file("exercise2_letters", O_CREAT | O_WRONLY | O_TRUNC);
-    numbers_file = open_file("exercise2_numbers", O_CREAT | O_WRONLY | O_TRUNC);
+    const unsigned int offset = strtol(argv[1], NULL, 10);
+    const size_t buff_size = int_to_size_t(strtol(argv[2], NULL, 10));
+    
+    data_file = open_file("data2.txt", O_RDONLY, S_IRUSR | S_IWUSR);
+    letters_file = open_file("exercise2_letters", O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    numbers_file = open_file("exercise2_numbers", O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
 
     fill_and_dump(buff_size, offset);
 
@@ -43,8 +43,8 @@ int main (int argc, char *argv[]) {
     return 0;
 }
 
-int open_file (const char *path, const int permissions) {
-    int const file_des = open(path, permissions);
+int open_file (const char *path, const int flag, const mode_t mode) {
+    int const file_des = open(path, flag, mode);
     if (file_des < 0) {
         perror("Cannot open file");
         printf("%s\n", path);
